@@ -24,14 +24,14 @@ export enum Role {
 }
 
 export const ROLE_LEVELS: Record<Role, number> = {
-  [Role.IT_ADMIN]: 99,
-  [Role.CEO]: 5,
-  [Role.COO]: 5,
-  [Role.CSO]: 5,
-  [Role.COO_ASSOCIATE]: 4,
+  [Role.IT_ADMIN]: 0,
+  [Role.CEO]: 1,
+  [Role.COO]: 1,
+  [Role.CSO]: 1,
+  [Role.COO_ASSOCIATE]: 2,
   [Role.DEPARTMENT_HEAD]: 3,
-  [Role.SENIOR_ASSOCIATE]: 2,
-  [Role.JUNIOR_ASSOCIATE]: 1,
+  [Role.SENIOR_ASSOCIATE]: 4,
+  [Role.JUNIOR_ASSOCIATE]: 5,
 };
 
 export type TaskStatus = 'pending' | 'in_progress' | 'completed' | 'reviewed';
@@ -42,36 +42,38 @@ export interface User {
   name: string;
   email: string;
   role: Role;
-  departmentId?: string;
-  avatar?: string;
+  role_level: number;
+  department_id?: string;
+  avatar_url?: string;
+  password?: string;
 }
 
 export interface Task {
   id: string;
   title: string;
   description: string;
-  assignedBy: string; // User ID
-  assignedTo: string; // User ID
+  assigned_by: string; // User ID
+  assigned_to: string; // User ID
   status: TaskStatus;
   priority: Priority;
   deadline: string; // ISO Date
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Comment {
   id: string;
-  taskId: string;
-  userId: string;
+  task_id: string;
+  user_id: string;
   text: string;
-  createdAt: string;
+  created_at: string;
 }
 
 export interface Notification {
   id: string;
-  userId: string;
+  user_id: string;
   message: string;
   read: boolean;
-  createdAt: string;
+  created_at: string;
   type: 'assignment' | 'deadline' | 'mention';
 }
