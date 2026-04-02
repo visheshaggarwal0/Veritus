@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Outfit } from "next/font/google";
 import "./globals.css";
+import { Toaster } from 'sonner';
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
   title: "Veritus | Hierarchical CRM",
   description: "Modern task management for structured organizations.",
+  icons: {
+    icon: "/icon.png",
+  },
 };
 
 export default function RootLayout({
@@ -16,7 +21,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans`}>{children}</body>
+      <body className={`${outfit.variable} font-sans antialiased text-zinc-900 bg-white`}>
+        {children}
+        <Toaster position="top-center" richColors />
+      </body>
     </html>
   );
 }
+
+

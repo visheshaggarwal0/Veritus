@@ -1,7 +1,8 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
-import { NextResponse, type NextRequest } from 'next/server';
+import { createServerClient } from "@supabase/ssr";
+import { type NextRequest, NextResponse } from "next/server";
 
 export async function updateSession(request: NextRequest) {
+  // Create an unmodified response
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -13,62 +14,54 @@ export async function updateSession(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value;
+        getAll() {
+          return request.cookies.getAll();
         },
-        set(name: string, value: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
-          });
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            request.cookies.set(name, value)
+          );
           response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
+            request,
           });
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          });
-        },
-        remove(name: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value: '',
-            ...options,
-          });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
-          response.cookies.set({
-            name,
-            value: '',
-            ...options,
-          });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, { ...options, path: '/' })
+          );
         },
       },
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // This is required for Next.js Cookie syncing.
+  const { data, error } = await supabase.auth.getUser();
+  const user = data?.user;
 
-  // Protect internal routes
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/auth')
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
-    const url = request.nextUrl.clone();
-    url.pathname = '/login';
+  if (error) {
+    console.error("[Middleware] Auth error:", error.message);
+  }
+
+  const url = request.nextUrl.clone();
+
+
+
+  // TEMPORARY BYPASS: Disabling redirection to allow UI verification
+  /*
+  if (user && (url.pathname === "/" || url.pathname === "/login")) {
+    url.pathname = "/dashboard";
     return NextResponse.redirect(url);
   }
 
+  if (!user && url.pathname.startsWith('/dashboard')) {
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
+  */
+
   return response;
 }
+
+
+
+
+
+

@@ -28,46 +28,48 @@ export function Sidebar({ user }: { user: User }) {
 
   return (
     <aside className="w-72 border-r border-zinc-100 p-8 flex flex-col shrink-0 h-screen sticky top-0 overflow-y-auto bg-white">
-      <div className="flex items-center gap-3 mb-12 px-2 shrink-0">
-        <div className="w-10 h-10 bg-zinc-900 rounded-2xl flex items-center justify-center rotate-3 shadow-xl shadow-zinc-200">
-          <span className="text-white text-lg font-black italic -rotate-3">V</span>
+      <div className="flex items-center gap-3 mb-10 px-2 shrink-0">
+        <div className="w-9 h-9 bg-zinc-900 rounded-xl flex items-center justify-center shadow-sm">
+          <span className="text-white text-base font-bold">V</span>
         </div>
-        <span className="text-xl font-black tracking-tighter">VERITUS</span>
+        <span className="text-lg font-bold tracking-tight">Veritus</span>
       </div>
 
+
       {/* User Profile Detail Section */}
-      <div className="mb-10 p-6 bg-zinc-50 rounded-4xl border border-zinc-100 shrink-0">
-        <div className="flex items-center gap-4 mb-6">
+      <div className="mb-8 p-6 bg-zinc-50/50 rounded-2xl border border-zinc-100 shrink-0">
+        <div className="flex items-center gap-4 mb-5">
           <div className="relative">
             <img 
               src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`} 
-              className="w-14 h-14 rounded-2xl border-4 border-white shadow-xl" 
+              className="w-12 h-12 rounded-xl border-2 border-white shadow-sm" 
               alt="Avatar" 
             />
-            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-400 rounded-full border-2 border-white shadow-sm" />
+            <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-emerald-400 rounded-full border-2 border-white shadow-sm" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-base font-black truncate leading-tight text-zinc-900">{user.name}</div>
-            <div className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mt-1">{user.role}</div>
+            <div className="text-sm font-bold truncate leading-tight text-zinc-900">{user.name}</div>
+            <div className="text-[11px] font-semibold text-zinc-400 mt-0.5">{user.role}</div>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <button className="flex items-center justify-center gap-2 py-2.5 bg-white border border-zinc-200 rounded-xl text-[10px] font-black text-zinc-500 hover:text-zinc-900 hover:border-zinc-900 transition-all shadow-sm">
-            <Settings size={12} className="stroke-3" />
-            SETTINGS
+          <button className="flex items-center justify-center gap-2 py-2 bg-white border border-zinc-200 rounded-lg text-[10px] font-semibold text-zinc-500 hover:text-zinc-900 hover:border-zinc-300 transition-all shadow-sm">
+            <Settings size={12} className="stroke-2" />
+            Settings
           </button>
           <button 
             onClick={handleLogout}
-            className="flex items-center justify-center gap-2 py-2.5 bg-white border border-zinc-200 rounded-xl text-[10px] font-black text-zinc-500 hover:text-zinc-900 hover:border-zinc-900 transition-all shadow-sm"
+            className="flex items-center justify-center gap-2 py-2 bg-white border border-zinc-200 rounded-lg text-[10px] font-semibold text-zinc-500 hover:text-zinc-900 hover:border-zinc-300 transition-all shadow-sm"
           >
-            <LogOut size={12} className="stroke-3" />
-            LOGOUT
+            <LogOut size={12} className="stroke-2" />
+            Logout
           </button>
         </div>
       </div>
 
-      <nav className="flex-1 space-y-2">
-        <div className="px-5 mb-4 text-[10px] font-black text-zinc-300 uppercase tracking-[0.25em]">Main Workflow</div>
+
+      <nav className="flex-1 space-y-1">
+        <div className="px-4 mb-2 text-[11px] font-semibold text-zinc-300 uppercase tracking-wider">Main Workflow</div>
         <SidebarItem 
           icon={LayoutDashboard} 
           label="Dashboard" 
@@ -89,7 +91,7 @@ export function Sidebar({ user }: { user: User }) {
         
         {user.role_level === 0 && (
           <>
-            <div className="pt-10 pb-4 px-5 text-[10px] font-black text-zinc-300 uppercase tracking-[0.25em]">Infrastructure</div>
+            <div className="pt-8 pb-2 px-4 text-[11px] font-semibold text-zinc-300 uppercase tracking-wider">Infrastructure</div>
             <SidebarItem 
               icon={UsersIcon} 
               label="User Directory" 
@@ -105,14 +107,15 @@ export function Sidebar({ user }: { user: User }) {
           </>
         )}
 
-        <div className="pt-10 pb-4 px-5 text-[10px] font-black text-zinc-300 uppercase tracking-[0.25em]">Quick Actions</div>
-        <button className="flex items-center gap-3 w-full px-5 py-4 text-xs font-black text-white bg-zinc-900 rounded-2xl hover:bg-zinc-800 transition-all shadow-xl shadow-zinc-100 group">
-          <div className="p-1 bg-white/10 rounded-lg group-hover:scale-110 transition-transform">
-            <Plus size={16} className="stroke-3" />
+        <div className="pt-8 pb-3 px-4 text-[11px] font-semibold text-zinc-300 uppercase tracking-wider">Quick Actions</div>
+        <button className="flex items-center gap-3 w-full px-4 py-3.5 text-xs font-bold text-white bg-zinc-900 rounded-xl hover:bg-zinc-800 transition-all shadow-md group">
+          <div className="p-1 bg-white/10 rounded-lg group-hover:scale-105 transition-transform">
+            <Plus size={16} />
           </div>
-          NEW TASK
+          New Task
         </button>
       </nav>
+
       
       <div className="mt-auto pt-8 border-t border-zinc-100">
         <div className="flex items-center gap-2 px-2 text-[9px] font-black text-zinc-300 uppercase tracking-widest">

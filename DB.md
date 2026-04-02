@@ -21,12 +21,13 @@ This document tracks the current state of the PostgreSQL (Supabase) schema and t
 ## 🌱 Seeded Data (v1.0)
 
 The following official departments are currently seeded:
-1. `R&D`
-2. `Business Research & Analysis`
+1. `Digital Infrastructure`
+2. `Legal & IP`
 3. `Digital Engagement & Design`
-4. `Legal & IP`
-5. `Global Alliance & Advocacy`
-6. `Digital Infrastructure`
+4. `Global Alliance & Advocacy`
+5. `R&D`
+6. `Business Research & Analysis`
+
 
 ## 🔄 Triggers & Functions
 

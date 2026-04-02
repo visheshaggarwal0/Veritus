@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { motion, Reorder, AnimatePresence } from "framer-motion";
-import { 
-  Plus, 
-  ChevronRight, 
-  Clock, 
-  Filter, 
+import {
+  Plus,
+  ChevronRight,
+  Clock,
+  Filter,
   SortAsc,
   MoreVertical
 } from 'lucide-react';
@@ -26,7 +26,7 @@ export default function KanbanPage() {
         .from("tasks")
         .select("*")
         .order("created_at", { ascending: false });
-      
+
       if (data) setTasks(data);
       setLoading(false);
     }
@@ -60,7 +60,7 @@ export default function KanbanPage() {
       .from("tasks")
       .update({ status: newStatus, updated_at: new Date().toISOString() })
       .eq("id", taskId);
-    
+
     if (error) console.error("Update error:", error);
   };
 
@@ -86,7 +86,7 @@ export default function KanbanPage() {
           </div>
           <div className="h-8 w-px bg-zinc-200 mx-1" />
           <button className="p-3 bg-white border border-zinc-100 rounded-2xl text-zinc-400 hover:text-zinc-900 shadow-sm transition-all active:scale-95">
-            <Filter size={18} className="stroke-[3]" />
+            <Filter size={18} className="stroke-3" />
           </button>
         </div>
       </div>
@@ -99,9 +99,9 @@ export default function KanbanPage() {
               <div className="flex items-center gap-3">
                 <div className={cn(
                   "w-3 h-3 rounded-full shadow-sm",
-                  status === 'pending' ? "bg-zinc-300" : 
-                  status === 'in_progress' ? "bg-zinc-900 shadow-zinc-200" :
-                  status === 'completed' ? "bg-zinc-500" : "bg-zinc-950 ring-4 ring-white"
+                  status === 'pending' ? "bg-zinc-300" :
+                    status === 'in_progress' ? "bg-zinc-900 shadow-zinc-200" :
+                      status === 'completed' ? "bg-zinc-500" : "bg-zinc-950 ring-4 ring-white"
                 )} />
                 <h3 className="text-[12px] font-black text-zinc-900 uppercase tracking-[0.2em]">
                   {status.replace('_', ' ')}
@@ -111,7 +111,7 @@ export default function KanbanPage() {
                 {tasks.filter((t: Task) => t.status === status).length} DIRECTIVES
               </span>
             </div>
-            
+
             {/* Card Area */}
             <div className="flex-1 px-4 pb-8 space-y-4 overflow-y-auto scrollbar-hide hover:scrollbar-default transition-all">
               <AnimatePresence mode="popLayout">
@@ -136,22 +136,22 @@ export default function KanbanPage() {
                     <p className="text-xs text-zinc-500 line-clamp-2 mb-6 leading-relaxed font-medium">
                       {task.description}
                     </p>
-                    
+
                     <div className="flex items-center justify-between pt-6 border-t border-zinc-50">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-2xl bg-zinc-900 border-2 border-white flex items-center justify-center text-xs font-black text-white italic rotate-3 shadow-md">
                           {task.assigned_to.charAt(0).toUpperCase()}
                         </div>
                         <div className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
-                          <Clock size={12} className="stroke-[3]" />
+                          <Clock size={12} className="stroke-3" />
                           {new Date(task.deadline).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                         </div>
                       </div>
-                      
+
                       {/* Workflow Navigation */}
                       <div className="flex items-center gap-1 opacity-0 group-hover/card:opacity-100 transition-all translate-x-4 group-hover/card:translate-x-0">
                         {status !== 'reviewed' && (
-                          <button 
+                          <button
                             onClick={(e) => {
                               e.stopPropagation();
                               const nextStatus = columns[columns.indexOf(status) + 1];
@@ -167,9 +167,9 @@ export default function KanbanPage() {
                   </motion.div>
                 ))}
               </AnimatePresence>
-              
+
               <button className="w-full py-10 border-2 border-dashed border-zinc-100 rounded-[2.5rem] text-zinc-300 hover:text-zinc-900 hover:border-zinc-900 hover:bg-white transition-all text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3 active:scale-[0.98]">
-                <Plus size={16} className="stroke-[3]" />
+                <Plus size={16} className="stroke-3" />
                 Initialize Directive
               </button>
             </div>

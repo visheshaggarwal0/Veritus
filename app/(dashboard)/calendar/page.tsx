@@ -2,24 +2,24 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { 
-  ChevronLeft, 
-  ChevronRight, 
+import {
+  ChevronLeft,
+  ChevronRight,
   Calendar as CalendarIcon,
   Tag,
   Clock,
   ArrowUpRight
 } from 'lucide-react';
-import { 
-  format, 
-  addMonths, 
-  subMonths, 
-  startOfMonth, 
-  endOfMonth, 
-  startOfWeek, 
-  endOfWeek, 
-  isSameMonth, 
-  isSameDay, 
+import {
+  format,
+  addMonths,
+  subMonths,
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  isSameMonth,
+  isSameDay,
   addDays,
   isToday
 } from "date-fns";
@@ -38,7 +38,7 @@ export default function CalendarPage() {
         .from("tasks")
         .select("*")
         .order("deadline", { ascending: true });
-      
+
       if (data) setTasks(data);
       setLoading(false);
     }
@@ -54,23 +54,23 @@ export default function CalendarPage() {
         </div>
         <div className="flex items-center gap-6">
           <div className="flex items-center bg-white p-1.5 rounded-2xl border border-zinc-100 shadow-sm">
-            <button 
+            <button
               onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
               className="p-3 hover:bg-zinc-50 rounded-xl transition-all text-zinc-400 hover:text-zinc-900"
             >
-              <ChevronLeft size={20} className="stroke-[3]" />
+              <ChevronLeft size={20} className="stroke-3" />
             </button>
             <div className="px-6 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-900 min-w-[180px] text-center italic">
               {format(currentMonth, "MMMM yyyy")}
             </div>
-            <button 
+            <button
               onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
               className="p-3 hover:bg-zinc-50 rounded-xl transition-all text-zinc-400 hover:text-zinc-900"
             >
-              <ChevronRight size={20} className="stroke-[3]" />
+              <ChevronRight size={20} className="stroke-3" />
             </button>
           </div>
-          <button 
+          <button
             onClick={() => setCurrentMonth(new Date())}
             className="px-6 py-4 bg-zinc-900 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-zinc-800 transition-all shadow-xl shadow-zinc-200 active:scale-95"
           >
@@ -108,7 +108,7 @@ export default function CalendarPage() {
       for (let i = 0; i < 7; i++) {
         const currentDay = day;
         const dayTasks = tasks.filter((t) => isSameDay(new Date(t.deadline), currentDay));
-        
+
         days.push(
           <div
             key={day.toString()}
@@ -132,8 +132,8 @@ export default function CalendarPage() {
 
             <div className="space-y-2 relative z-10 flex-1">
               {dayTasks.slice(0, 3).map((task) => (
-                <div 
-                  key={task.id} 
+                <div
+                  key={task.id}
                   className={cn(
                     "p-2.5 rounded-2xl text-[10px] font-black uppercase tracking-tight truncate border transition-all cursor-pointer hover:scale-105",
                     task.priority === 'high' ? "bg-zinc-900 text-white border-zinc-900 shadow-xl" : "bg-white text-zinc-900 border-zinc-100"
@@ -179,9 +179,9 @@ export default function CalendarPage() {
       {renderHeader()}
       <div className="p-10 bg-white border border-zinc-100 rounded-[4rem] shadow-2xl shadow-zinc-100 flex flex-col relative overflow-hidden">
         <div className="absolute top-0 right-0 p-12 opacity-[0.02] pointer-events-none">
-          <CalendarIcon size={400} className="text-zinc-900 stroke-[1]" />
+          <CalendarIcon size={400} className="text-zinc-900 stroke-1" />
         </div>
-        
+
         {renderDays()}
         <div className="flex-1 overflow-y-auto pr-4 pt-4 scrollbar-hide">
           {renderCells()}

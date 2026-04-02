@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
@@ -91,76 +93,76 @@ export function NewTaskModal({ isOpen, onClose, currentUser }: NewTaskModalProps
       {isOpen && (
         <div className="fixed inset-0 z-100 flex items-center justify-center p-6 bg-zinc-900/40 backdrop-blur-md">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="w-full max-w-2xl bg-white rounded-[3rem] shadow-3xl border border-zinc-100 overflow-hidden relative"
+            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            className="w-full max-w-2xl bg-white rounded-2xl shadow-xl border border-zinc-100 overflow-hidden relative"
           >
-            <div className="absolute top-0 left-0 w-full h-2 bg-linear-to-r from-zinc-100 via-zinc-900 to-zinc-100" />
+            <div className="absolute top-0 left-0 w-full h-1 bg-zinc-900" />
             
-            <section className="p-10">
-              <div className="flex items-center justify-between mb-10">
+            <section className="p-8">
+              <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-zinc-900 text-white rounded-2xl shadow-xl shadow-zinc-200">
-                    <Terminal size={20} className="stroke-3" />
+                  <div className="p-2.5 bg-zinc-900 text-white rounded-xl shadow-md">
+                    <Plus size={18} />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-black tracking-tighter text-zinc-900 uppercase italic">Directive Initialization</h2>
-                    <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.25em]">Strategic Task Assignment Protocol</p>
+                    <h2 className="text-xl font-bold tracking-tight text-zinc-900">Initialize New Task</h2>
+                    <p className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Strategic Assignment Protocol</p>
                   </div>
                 </div>
                 <button 
                   onClick={onClose}
-                  className="p-3 hover:bg-zinc-50 rounded-2xl transition-all text-zinc-300 hover:text-zinc-900"
+                  className="p-2 hover:bg-zinc-50 rounded-lg transition-all text-zinc-300 hover:text-zinc-900"
                 >
-                  <X size={24} className="stroke-3" />
+                  <X size={20} />
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-8">
-                <div>
-                  <label className="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3 ml-2">Objective Title</label>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-2">
+                  <label className="block text-[11px] font-semibold text-zinc-400 uppercase tracking-wider ml-1">Task Objective</label>
                   <input 
                     type="text" 
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     required
-                    className="w-full px-6 py-4 bg-zinc-50 border border-zinc-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-900 transition-all font-bold text-sm"
-                    placeholder="Briefly describe the mission objective..."
+                    className="w-full px-5 py-3.5 bg-zinc-50 border border-zinc-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900/5 focus:border-zinc-300 transition-all font-semibold text-sm"
+                    placeholder="Enter short mission title..."
                   />
                 </div>
 
-                <div>
-                  <label className="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3 ml-2">Mission Intelligence (Description)</label>
+                <div className="space-y-2">
+                  <label className="block text-[11px] font-semibold text-zinc-400 uppercase tracking-wider ml-1">Mission Details</label>
                   <textarea 
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full px-6 py-4 bg-zinc-50 border border-zinc-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-900 transition-all font-medium text-sm min-h-[120px] resize-none"
-                    placeholder="Provide full context and technical requirements..."
+                    className="w-full px-5 py-3.5 bg-zinc-50 border border-zinc-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900/5 focus:border-zinc-300 transition-all font-medium text-sm min-h-[100px] resize-none"
+                    placeholder="Provide context and key requirements..."
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-8">
-                  <div>
-                    <label className="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3 ml-2">Assign to Personnel</label>
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="block text-[11px] font-semibold text-zinc-400 uppercase tracking-wider ml-1">Assign to Personnel</label>
                     <div className="relative">
                       <select 
                         value={assignedTo}
                         onChange={(e) => setAssignedTo(e.target.value)}
                         required
-                        className="w-full px-6 py-4 bg-zinc-50 border border-zinc-100 rounded-2xl focus:outline-none appearance-none font-bold text-sm cursor-pointer"
+                        className="w-full px-5 py-3.5 bg-zinc-50 border border-zinc-100 rounded-xl focus:outline-none appearance-none font-semibold text-sm cursor-pointer"
                       >
                         <option value="">Select Subordinate...</option>
                         {subordinates.map(sub => (
                           <option key={sub.id} value={sub.id}>{sub.name} — {sub.role}</option>
                         ))}
                       </select>
-                      <UserIcon size={16} className="absolute right-6 top-1/2 -translate-y-1/2 text-zinc-300 pointer-events-none" />
+                      <UserIcon size={14} className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-300 pointer-events-none" />
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3 ml-2">Directive Priority</label>
+                  <div className="space-y-2">
+                    <label className="block text-[11px] font-semibold text-zinc-400 uppercase tracking-wider ml-1">Priority Status</label>
                     <div className="grid grid-cols-3 gap-2">
                       {(['low', 'medium', 'high'] as Priority[]).map(p => (
                         <button
@@ -168,8 +170,8 @@ export function NewTaskModal({ isOpen, onClose, currentUser }: NewTaskModalProps
                           type="button"
                           onClick={() => setPriority(p)}
                           className={cn(
-                            "py-3 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all",
-                            priority === p ? "bg-zinc-900 text-white border-zinc-900 shadow-lg" : "bg-white text-zinc-400 border-zinc-100 hover:border-zinc-900"
+                            "py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-all",
+                            priority === p ? "bg-zinc-900 text-white border-zinc-900 shadow-md" : "bg-white text-zinc-400 border-zinc-100 hover:border-zinc-300"
                           )}
                         >
                           {p}
@@ -179,18 +181,18 @@ export function NewTaskModal({ isOpen, onClose, currentUser }: NewTaskModalProps
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-8">
-                   <div>
-                    <label className="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3 ml-2">Mission Deadline</label>
+                <div className="grid grid-cols-2 gap-6 pt-2">
+                   <div className="space-y-2">
+                    <label className="block text-[11px] font-semibold text-zinc-400 uppercase tracking-wider ml-1">Mission Deadline</label>
                     <div className="relative">
                       <input 
                         type="date" 
                         value={deadline}
                         onChange={(e) => setDeadline(e.target.value)}
                         required
-                        className="w-full px-6 py-4 bg-zinc-50 border border-zinc-100 rounded-2xl focus:outline-none appearance-none font-bold text-sm cursor-pointer"
+                        className="w-full px-5 py-3.5 bg-zinc-50 border border-zinc-100 rounded-xl focus:outline-none appearance-none font-semibold text-sm cursor-pointer"
                       />
-                      <CalendarIcon size={16} className="absolute right-6 top-1/2 -translate-y-1/2 text-zinc-300 pointer-events-none" />
+                      <CalendarIcon size={14} className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-300 pointer-events-none" />
                     </div>
                   </div>
                   
@@ -198,12 +200,12 @@ export function NewTaskModal({ isOpen, onClose, currentUser }: NewTaskModalProps
                      <button
                       type="submit"
                       disabled={loading}
-                      className="w-full py-4 bg-zinc-900 text-white font-black rounded-2xl hover:bg-zinc-800 transition-all shadow-2xl shadow-zinc-200 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3 uppercase tracking-widest text-[10px]"
+                      className="w-full py-3.5 bg-zinc-900 text-white font-bold rounded-xl hover:bg-zinc-800 transition-all shadow-lg active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 text-xs"
                     >
-                      {loading ? "INITIALIZING..." : (
+                      {loading ? "Initializing..." : (
                         <>
-                          <ShieldCheck size={18} className="stroke-3" />
-                          Confirm Strategy
+                          <ShieldCheck size={16} />
+                          Confirm Directive
                         </>
                       )}
                     </button>
@@ -212,17 +214,18 @@ export function NewTaskModal({ isOpen, onClose, currentUser }: NewTaskModalProps
               </form>
             </section>
             
-            <div className="p-6 bg-zinc-50 border-t border-zinc-100 flex items-center justify-center gap-8">
-              <div className="flex items-center gap-2 opacity-40">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                <span className="text-[9px] font-black uppercase tracking-widest text-zinc-900">Encrypted Transmission</span>
+            <div className="p-4 bg-zinc-50 border-t border-zinc-100 flex items-center justify-center gap-8">
+              <div className="flex items-center gap-2 opacity-50">
+                <div className="w-1 h-1 rounded-full bg-emerald-500" />
+                <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Secure Transmission</span>
               </div>
-              <div className="flex items-center gap-2 opacity-40">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                <span className="text-[9px] font-black uppercase tracking-widest text-zinc-900">RLS Validated</span>
+              <div className="flex items-center gap-2 opacity-50">
+                <div className="w-1 h-1 rounded-full bg-emerald-500" />
+                <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Access Validated</span>
               </div>
             </div>
           </motion.div>
+
         </div>
       )}
     </AnimatePresence>

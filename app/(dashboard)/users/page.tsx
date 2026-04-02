@@ -1,8 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
-import { 
-  Plus, 
-  Settings, 
-  Building2, 
+import {
+  Plus,
+  Settings,
+  Building2,
   UserCircle,
   ShieldCheck,
   Search,
@@ -44,7 +44,7 @@ export default async function UsersPage() {
         </div>
         {isITAdmin && (
           <button className="flex items-center gap-2 px-6 py-4 bg-zinc-900 text-white text-xs font-black rounded-2xl hover:bg-zinc-800 transition-all shadow-xl shadow-zinc-200 active:scale-95 uppercase tracking-widest">
-            <Plus size={18} className="stroke-[3]" />
+            <Plus size={18} className="stroke-3" />
             Provision New Account
           </button>
         )}
@@ -52,10 +52,10 @@ export default async function UsersPage() {
 
       <div className="flex items-center gap-4 bg-white p-6 rounded-[2.5rem] border border-zinc-100 shadow-sm shrink-0">
         <div className="flex items-center gap-3 bg-zinc-50 px-6 py-3 rounded-2xl border border-zinc-100 flex-1">
-          <Search size={18} className="text-zinc-400 stroke-[3]" />
-          <input 
-            type="text" 
-            placeholder="Filter by rank, department, or identity..." 
+          <Search size={18} className="text-zinc-400 stroke-3" />
+          <input
+            type="text"
+            placeholder="Filter by rank, department, or identity..."
             className="bg-transparent border-none focus:outline-none text-sm w-full font-bold placeholder:text-zinc-300"
           />
         </div>
@@ -68,7 +68,7 @@ export default async function UsersPage() {
           ))}
         </div>
       </div>
-      
+
       <div className="bg-white border border-zinc-100 rounded-[3rem] overflow-hidden shadow-2xl shadow-zinc-100">
         <div className="overflow-x-auto scrollbar-hide">
           <table className="w-full text-left border-collapse min-w-[1000px]">
@@ -86,10 +86,10 @@ export default async function UsersPage() {
                   <td className="px-10 py-10">
                     <div className="flex items-center gap-6">
                       <div className="relative group/avatar">
-                        <img 
-                          src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`} 
-                          className="w-14 h-14 rounded-2xl border-4 border-white shadow-xl group-hover/avatar:scale-110 transition-transform duration-500" 
-                          alt="" 
+                        <img
+                          src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`}
+                          className="w-14 h-14 rounded-2xl border-4 border-white shadow-xl group-hover/avatar:scale-110 transition-transform duration-500"
+                          alt=""
                         />
                         <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center border-2 border-zinc-50 shadow-md">
                           <div className={cn("w-2 h-2 rounded-full", user.role_level === 0 ? "bg-zinc-900" : "bg-emerald-400")} />
@@ -109,7 +109,7 @@ export default async function UsersPage() {
                   </td>
                   <td className="px-10 py-10">
                     <div className="flex items-center gap-3 text-[11px] text-zinc-900 font-black uppercase tracking-widest">
-                      <Building2 size={16} className="text-zinc-200 stroke-[3]" />
+                      <Building2 size={16} className="text-zinc-200 stroke-3" />
                       {user.department_id || 'Global Operational Node'}
                     </div>
                   </td>
@@ -141,7 +141,7 @@ export default async function UsersPage() {
             <div className="max-w-2xl">
               <h4 className="text-xl font-black mb-3 italic uppercase tracking-tight">Security Infrastructure Advanced Console</h4>
               <p className="text-xs text-zinc-400 font-medium leading-relaxed tracking-wide">
-                Direct write-access to the hierarchical permission matrix is enabled for your executive node. 
+                Direct write-access to the hierarchical permission matrix is enabled for your executive node.
                 All modifications to user profiles and access levels are cryptographically logged in the system audit trail.
               </p>
             </div>
@@ -149,7 +149,7 @@ export default async function UsersPage() {
               Open Audit Console
             </button>
           </div>
-          <ShieldCheck size={200} className="absolute -bottom-20 -right-20 text-white/[0.03] group-hover:rotate-12 group-hover:scale-110 transition-all duration-1000 stroke-[1.5]" />
+          <ShieldCheck size={200} className="absolute -bottom-20 -right-20 text-white/3 group-hover:rotate-12 group-hover:scale-110 transition-all duration-1000 stroke-[1.5]" />
         </div>
       )}
     </div>
