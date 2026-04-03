@@ -27,3 +27,20 @@ export async function createClient() {
     }
   );
 }
+
+/**
+ * Admin client for specialized server-side operations.
+ * Bypasses RLS - USE WITH CAUTION.
+ */
+export async function createAdminClient() {
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      cookies: {
+        getAll() { return [] },
+        setAll() { },
+      },
+    }
+  );
+}

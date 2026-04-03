@@ -7,21 +7,25 @@ import { Badge } from "@/components/Badge";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { User as UserType } from "@/lib/types";
+import { repairIdentityAction } from "@/app/(dashboard)/users/actions";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<UserType | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authUser, setAuthUser] = useState<any>(null);
+  const [repairing, setRepairing] = useState(false);
   const supabase = createClient();
   const router = useRouter();
 
   useEffect(() => {
     async function fetchProfile() {
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (authUser) {
+      const { data: { user } } = await supabase.auth.getUser();
+      setAuthUser(user);
+      if (user) {
         const { data } = await supabase
           .from("profiles")
           .select("*")
-          .eq("id", authUser.id)
+          .eq("email", user.email)
           .single();
         if (data) setProfile(data as UserType);
       }
@@ -29,6 +33,24 @@ export default function ProfilePage() {
     }
     fetchProfile();
   }, [supabase]);
+
+  const handleRepair = async () => {
+    if (!authUser) return;
+    setRepairing(true);
+    try {
+      await repairIdentityAction(authUser.id, authUser.user_metadata);
+      // Wait a moment for the DB to stabilize then refresh
+      setTimeout(() => {
+        router.refresh();
+        window.location.reload();
+      }, 1000);
+    } catch (err) {
+      console.error("Repair failed:", err);
+      alert("Identity repair failed. Contact system administrator.");
+    } finally {
+      setRepairing(false);
+    }
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -41,6 +63,28 @@ export default function ProfilePage() {
       <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)] animate-in fade-in duration-500">
         <div className="w-10 h-10 border-2 border-zinc-900 border-t-transparent rounded-full animate-spin mb-4" />
         <p className="text-zinc-400 font-semibold text-xs uppercase tracking-widest">Accessing Identity Node...</p>
+      </div>
+    );
+  }
+
+  if (!profile && authUser) {
+    return (
+      <div className="max-w-4xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-zinc-500 bg-white border border-zinc-100 rounded-3xl p-12 shadow-sm">
+          <ShieldCheck size={64} className="mb-6 text-zinc-900 stroke-1 animate-pulse" />
+          <h2 className="text-2xl font-bold text-zinc-900 font-display mb-2">Identity De-synchronized</h2>
+          <p className="text-sm font-medium mb-8 text-center max-w-sm">
+            A valid session exists, but your tactical profile record is missing from the database. 
+            Use the protocol below to reconstruct your identity from Auth metadata.
+          </p>
+          <button
+            onClick={handleRepair}
+            disabled={repairing}
+            className="px-10 py-5 bg-zinc-900 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl hover:bg-zinc-800 transition-all shadow-xl active:scale-95 disabled:opacity-50"
+          >
+            {repairing ? "Synchronizing Node..." : "Initialize Identity Repair"}
+          </button>
+        </div>
       </div>
     );
   }
@@ -104,7 +148,7 @@ export default function ProfilePage() {
                  </div>
                </div>
              </div>
-             <ShieldCheck size={120} className="absolute -bottom-10 -right-10 text-white/5 group-hover:rotate-12 transition-all duration-1000 stroke-[1]" />
+             <ShieldCheck size={120} className="absolute -bottom-10 -right-10 text-white/5 group-hover:rotate-12 transition-all duration-1000 stroke-1" />
           </div>
         </div>
 

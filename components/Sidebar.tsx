@@ -9,7 +9,7 @@ import {
   Plus, 
   Users as UsersIcon,
   ShieldCheck,
-  Settings
+  UserCircle
 } from 'lucide-react';
 import { Role, User } from '@/lib/types';
 import { SidebarItem } from './SidebarItem';
@@ -53,9 +53,12 @@ export function Sidebar({ user }: { user: User }) {
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <button className="flex items-center justify-center gap-2 py-2 bg-white border border-zinc-200 rounded-lg text-[10px] font-semibold text-zinc-500 hover:text-zinc-900 hover:border-zinc-300 transition-all shadow-sm">
-            <Settings size={12} className="stroke-2" />
-            Settings
+          <button 
+            onClick={() => router.push('/profile')}
+            className="flex items-center justify-center gap-2 py-2 bg-white border border-zinc-200 rounded-lg text-[10px] font-semibold text-zinc-500 hover:text-zinc-900 hover:border-zinc-300 transition-all shadow-sm"
+          >
+            <UserCircle size={12} className="stroke-2" />
+            Profile
           </button>
           <button 
             onClick={handleLogout}

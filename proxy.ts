@@ -1,8 +1,12 @@
 import { type NextRequest } from "next/server";
 import { updateSession } from "./lib/supabase/middleware";
 
-
-export async function middleware(request: NextRequest) {
+/**
+ * Next.js 16 Proxy Convention
+ * Replaces the deprecated 'middleware' file convention.
+ * Intercepts requests for session synchronization and route protection.
+ */
+export async function proxy(request: NextRequest) {
   return await updateSession(request);
 }
 
@@ -18,4 +22,3 @@ export const config = {
     '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 }
-

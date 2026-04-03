@@ -13,7 +13,7 @@ export function cn(...inputs: ClassValue[]) {
  * Higher level number = Higher authority
  */
 export enum Role {
-  IT_ADMIN = 'IT Administrator',
+  IT_ADMIN = 'IT Admin',
   CEO = 'CEO',
   COO = 'COO',
   CSO = 'CSO',
@@ -21,6 +21,7 @@ export enum Role {
   DEPARTMENT_HEAD = 'Department Head',
   SENIOR_ASSOCIATE = 'Senior Associate',
   JUNIOR_ASSOCIATE = 'Junior Associate',
+  GUEST = 'Visitor',
 }
 
 export const ROLE_LEVELS: Record<Role, number> = {
@@ -32,6 +33,7 @@ export const ROLE_LEVELS: Record<Role, number> = {
   [Role.DEPARTMENT_HEAD]: 3,
   [Role.SENIOR_ASSOCIATE]: 4,
   [Role.JUNIOR_ASSOCIATE]: 5,
+  [Role.GUEST]: 5,
 };
 
 export type TaskStatus = 'pending' | 'in_progress' | 'completed' | 'reviewed';
