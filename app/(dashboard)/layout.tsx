@@ -1,9 +1,8 @@
 import React from "react";
 import { redirect } from "next/navigation";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
-import { Sidebar } from "@/components/Sidebar";
 import { User, Role } from "@/lib/types";
-import { DashboardHeader } from "@/components/DashboardHeader";
+import { DashboardClientWrapper } from "@/components/DashboardClientWrapper";
 
 export const dynamic = "force-dynamic";
 
@@ -52,15 +51,8 @@ export default async function DashboardLayout({
   console.log(`[Identity Check] ID: ${user.id} | Level: ${profile.role_level} (${typeof profile.role_level}) | DB: ${!!fetchedProfile}`);
 
   return (
-    <div className="flex bg-white text-zinc-900 font-sans selection:bg-zinc-900 selection:text-white overflow-hidden min-h-screen">
-      <Sidebar user={profile as User} />
-
-      <main className="flex-1 flex flex-col bg-zinc-50/40 overflow-hidden relative">
-        <DashboardHeader currentUser={profile as User} />
-        <div className="flex-1 p-12 overflow-y-auto scrollbar-hide">
-          {children}
-        </div>
-      </main>
-    </div>
+    <DashboardClientWrapper user={profile as User}>
+      {children}
+    </DashboardClientWrapper>
   );
 }

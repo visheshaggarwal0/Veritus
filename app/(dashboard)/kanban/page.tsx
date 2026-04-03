@@ -12,16 +12,29 @@ import {
   MoreVertical
 } from 'lucide-react';
 import { Badge } from "@/components/Badge";
-import { Task, TaskStatus, cn } from "@/lib/types";
+import { Task, TaskStatus, cn, User } from "@/lib/types";
+import { TaskDetailModal } from "@/components/TaskDetailModal";
 
 export default function KanbanPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
   const columns: TaskStatus[] = ['pending', 'in_progress', 'completed', 'reviewed'];
 
   useEffect(() => {
-    async function fetchTasks() {
+    async function initialize() {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (authUser) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", authUser.id)
+          .single();
+        if (profile) setCurrentUser(profile as User);
+      }
+
       const { data } = await supabase
         .from("tasks")
         .select("*")
@@ -30,7 +43,7 @@ export default function KanbanPage() {
       if (data) setTasks(data);
       setLoading(false);
     }
-    fetchTasks();
+    initialize();
 
     // Subscribe to task changes
     const channel = supabase
@@ -74,15 +87,15 @@ export default function KanbanPage() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden animate-in fade-in duration-700">
-      <div className="flex items-center justify-between mb-10 shrink-0">
+      <div className="flex items-center justify-between mb-8 shrink-0">
         <div>
-          <h1 className="text-4xl font-black tracking-tighter text-zinc-900 mb-2">Project Execution</h1>
+          <h1 className="text-3xl font-serif font-medium tracking-tight text-zinc-900 mb-1">Project Execution</h1>
           <p className="text-zinc-500 font-medium text-sm italic">Strategic task distribution across operational status.</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center bg-white p-1.5 rounded-2xl border border-zinc-100 shadow-sm">
-            <button className="px-4 py-2 bg-zinc-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-md">Board View</button>
-            <button className="px-4 py-2 text-zinc-400 text-[10px] font-black uppercase tracking-widest rounded-xl hover:text-zinc-900 transition-all">List View</button>
+            <button className="px-4 py-2 bg-zinc-900 text-white text-[10px] font-semibold uppercase tracking-widest rounded-xl transition-all shadow-md">Board View</button>
+            <button className="px-4 py-2 text-zinc-400 text-[10px] font-semibold uppercase tracking-widest rounded-xl hover:text-zinc-900 transition-all">List View</button>
           </div>
           <div className="h-8 w-px bg-zinc-200 mx-1" />
           <button className="p-3 bg-white border border-zinc-100 rounded-2xl text-zinc-400 hover:text-zinc-900 shadow-sm transition-all active:scale-95">
@@ -91,11 +104,11 @@ export default function KanbanPage() {
         </div>
       </div>
 
-      <div className="flex-1 flex gap-8 overflow-x-auto pb-6 scrollbar-hide">
+      <div className="flex-1 flex gap-6 overflow-x-auto pb-6 scrollbar-hide">
         {columns.map((status) => (
-          <div key={status} className="shrink-0 w-[400px] flex flex-col bg-zinc-50/50 rounded-[3rem] border border-zinc-100/50 relative group">
+          <div key={status} className="shrink-0 w-[400px] flex flex-col bg-zinc-50/50 rounded-3xl border border-zinc-100/50 relative group">
             {/* Column Header */}
-            <div className="p-8 pb-4 flex items-center justify-between shrink-0">
+            <div className="p-6 pb-4 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
                 <div className={cn(
                   "w-3 h-3 rounded-full shadow-sm",
@@ -103,11 +116,11 @@ export default function KanbanPage() {
                     status === 'in_progress' ? "bg-zinc-900 shadow-zinc-200" :
                       status === 'completed' ? "bg-zinc-500" : "bg-zinc-950 ring-4 ring-white"
                 )} />
-                <h3 className="text-[12px] font-black text-zinc-900 uppercase tracking-[0.2em]">
+                <h3 className="text-[12px] font-semibold text-zinc-900 uppercase tracking-[0.2em]">
                   {status.replace('_', ' ')}
                 </h3>
               </div>
-              <span className="text-[10px] bg-white px-3 py-1.5 rounded-xl border border-zinc-100 text-zinc-950 font-black shadow-sm tracking-widest italic uppercase">
+              <span className="text-[10px] bg-white px-3 py-1.5 rounded-xl border border-zinc-100 text-zinc-950 font-semibold shadow-sm tracking-widest italic uppercase">
                 {tasks.filter((t: Task) => t.status === status).length} DIRECTIVES
               </span>
             </div>
@@ -122,7 +135,8 @@ export default function KanbanPage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     key={task.id}
-                    className="p-8 bg-white border border-zinc-100 rounded-[2.5rem] shadow-sm hover:shadow-2xl hover:shadow-zinc-200 hover:-translate-y-1 transition-all cursor-pointer group/card relative"
+                    onClick={() => setSelectedTask(task)}
+                    className="p-6 bg-white border border-zinc-100 rounded-2xl shadow-sm hover:shadow-2xl hover:shadow-zinc-200 hover:-translate-y-1 transition-all cursor-pointer group/card relative"
                   >
                     <div className="flex items-start justify-between mb-6">
                       <Badge variant={task.priority}>{task.priority}</Badge>
@@ -130,7 +144,7 @@ export default function KanbanPage() {
                         <MoreVertical size={16} />
                       </button>
                     </div>
-                    <div className="text-lg font-black text-zinc-900 mb-2 leading-tight group-hover/card:text-zinc-600 transition-colors uppercase tracking-tight italic">
+                    <div className="text-lg font-semibold text-zinc-900 mb-2 leading-tight group-hover/card:text-zinc-600 transition-colors uppercase tracking-tight italic">
                       {task.title}
                     </div>
                     <p className="text-xs text-zinc-500 line-clamp-2 mb-6 leading-relaxed font-medium">
@@ -139,10 +153,10 @@ export default function KanbanPage() {
 
                     <div className="flex items-center justify-between pt-6 border-t border-zinc-50">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-2xl bg-zinc-900 border-2 border-white flex items-center justify-center text-xs font-black text-white italic rotate-3 shadow-md">
+                        <div className="w-10 h-10 rounded-2xl bg-zinc-900 border-2 border-white flex items-center justify-center text-xs font-semibold text-white italic rotate-3 shadow-md">
                           {task.assigned_to.charAt(0).toUpperCase()}
                         </div>
-                        <div className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
+                        <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
                           <Clock size={12} className="stroke-3" />
                           {new Date(task.deadline).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                         </div>
@@ -168,7 +182,7 @@ export default function KanbanPage() {
                 ))}
               </AnimatePresence>
 
-              <button className="w-full py-10 border-2 border-dashed border-zinc-100 rounded-[2.5rem] text-zinc-300 hover:text-zinc-900 hover:border-zinc-900 hover:bg-white transition-all text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3 active:scale-[0.98]">
+              <button className="w-full py-6 border-2 border-dashed border-zinc-100 rounded-2xl text-zinc-300 hover:text-zinc-900 hover:border-zinc-900 hover:bg-white transition-all text-[10px] font-semibold uppercase tracking-[0.3em] flex items-center justify-center gap-3 active:scale-[0.98]">
                 <Plus size={16} className="stroke-3" />
                 Initialize Directive
               </button>
@@ -176,6 +190,15 @@ export default function KanbanPage() {
           </div>
         ))}
       </div>
+
+      {currentUser && (
+        <TaskDetailModal 
+          isOpen={!!selectedTask}
+          onClose={() => setSelectedTask(null)}
+          task={selectedTask}
+          currentUser={currentUser}
+        />
+      )}
     </div>
   );
 }

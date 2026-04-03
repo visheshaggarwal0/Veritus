@@ -36,9 +36,14 @@ next-env.d.ts
 
 # ide
 .vscode/
+.idea/
+*.swp
+*.swo
 
-# crm legacy
-src-old/
-dist/
-index.html
-vite.config.ts
+# antigravity
+.gemini/
+
+# document archives
+/docs/*.docx
+/docs/*.pdf
+/docs/*.txt

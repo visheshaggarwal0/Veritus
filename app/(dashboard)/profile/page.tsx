@@ -4,58 +4,55 @@ import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import { User, ShieldCheck, Mail, Building2, UserCircle, LogOut } from "lucide-react";
 import { Badge } from "@/components/Badge";
-import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { User as UserType } from "@/lib/types";
-import { repairIdentityAction } from "@/app/(dashboard)/users/actions";
+import { toast } from "sonner";
+import { getProfileBySession } from "./actions";
+import AvatarPicker from "@/components/AvatarPicker";
+import ChangePasswordModal from "@/components/ChangePasswordModal";
+import { Pencil, KeyRound } from "lucide-react";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<UserType | null>(null);
   const [loading, setLoading] = useState(true);
-  const [authUser, setAuthUser] = useState<any>(null);
-  const [repairing, setRepairing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const supabase = createClient();
   const router = useRouter();
 
   useEffect(() => {
-    async function fetchProfile() {
-      const { data: { user } } = await supabase.auth.getUser();
-      setAuthUser(user);
-      if (user) {
-        const { data } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("email", user.email)
-          .single();
-        if (data) setProfile(data as UserType);
+    async function fetchNode() {
+      const { data, error: fetchError } = await getProfileBySession();
+      if (data) {
+        setProfile(data);
+      } else if (fetchError) {
+        setError(fetchError);
       }
       setLoading(false);
     }
-    fetchProfile();
-  }, [supabase]);
+    fetchNode();
+  }, []);
 
-  const handleRepair = async () => {
-    if (!authUser) return;
-    setRepairing(true);
-    try {
-      await repairIdentityAction(authUser.id, authUser.user_metadata);
-      // Wait a moment for the DB to stabilize then refresh
-      setTimeout(() => {
-        router.refresh();
-        window.location.reload();
-      }, 1000);
-    } catch (err) {
-      console.error("Repair failed:", err);
-      alert("Identity repair failed. Contact system administrator.");
-    } finally {
-      setRepairing(false);
+  const handleUpdate = (newAvatar: string) => {
+    if (profile) {
+      setProfile({ ...profile, avatar_url: newAvatar });
+      router.refresh();
     }
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/login");
-    router.refresh();
+    const { error: logOutError } = await supabase.auth.signOut();
+    if (!logOutError) {
+      toast.success("Identity session terminated.", {
+        description: "Your operational node has been safely disconnected.",
+        duration: 3000,
+      });
+      router.push("/login");
+      router.refresh();
+    } else {
+      toast.error("Termination failed", { description: logOutError.message });
+    }
   };
 
   if (loading) {
@@ -67,22 +64,20 @@ export default function ProfilePage() {
     );
   }
 
-  if (!profile && authUser) {
+  if (!profile && !loading) {
     return (
       <div className="max-w-4xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
         <div className="flex flex-col items-center justify-center min-h-[60vh] text-zinc-500 bg-white border border-zinc-100 rounded-3xl p-12 shadow-sm">
-          <ShieldCheck size={64} className="mb-6 text-zinc-900 stroke-1 animate-pulse" />
-          <h2 className="text-2xl font-bold text-zinc-900 font-display mb-2">Identity De-synchronized</h2>
-          <p className="text-sm font-medium mb-8 text-center max-w-sm">
-            A valid session exists, but your tactical profile record is missing from the database. 
-            Use the protocol below to reconstruct your identity from Auth metadata.
+          <ShieldCheck size={64} className="mb-6 text-zinc-900 stroke-1" />
+          <h2 className="text-2xl font-bold text-zinc-900 font-display mb-2">Technical Profile Missing</h2>
+          <p className="text-sm font-medium mb-8 text-center max-w-sm text-zinc-400">
+            {error || "Your operational identity node could not be reconstructed from the database."}
           </p>
-          <button
-            onClick={handleRepair}
-            disabled={repairing}
-            className="px-10 py-5 bg-zinc-900 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl hover:bg-zinc-800 transition-all shadow-xl active:scale-95 disabled:opacity-50"
+          <button 
+            onClick={handleLogout}
+            className="px-8 py-4 bg-zinc-900 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl hover:bg-zinc-800 transition-all shadow-xl active:scale-95"
           >
-            {repairing ? "Synchronizing Node..." : "Initialize Identity Repair"}
+            Switch Identity
           </button>
         </div>
       </div>
@@ -93,36 +88,58 @@ export default function ProfilePage() {
 
   const stats = [
     { label: "Strategic Level", value: `Rank ${profile.role_level}`, icon: ShieldCheck },
-    { label: "Operational Unit", value: profile.department_id || "Global infrastructure", icon: Building2 },
+    { label: "Operational Department", value: profile.department_name || "Global infrastructure", icon: Building2 },
     { label: "Authorization", value: profile.role, icon: UserCircle },
   ];
 
+  const currentAvatar = profile.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.name}`;
+
   return (
     <div className="max-w-4xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
-      <div className="flex items-center justify-between px-1">
+      <AvatarPicker 
+        isOpen={isPickerOpen}
+        onClose={() => setIsPickerOpen(false)}
+        currentAvatar={currentAvatar}
+        onUpdate={handleUpdate}
+      />
+      
+      <ChangePasswordModal 
+        isOpen={isPasswordModalOpen}
+        onClose={() => setIsPasswordModalOpen(false)}
+      />
+      
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-1">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-zinc-900 mb-1 font-display">Personnel Profile</h1>
           <p className="text-zinc-400 font-medium text-sm">Manage your hierarchical identity and operational metadata.</p>
         </div>
         <button 
           onClick={handleLogout}
-          className="flex items-center gap-2 px-4 py-2 text-red-500 text-xs font-bold hover:bg-red-50 transition-all rounded-lg group"
+          className="flex items-center gap-2 px-4 py-2 text-red-500 text-xs font-bold hover:bg-red-50 transition-all rounded-lg group w-fit"
         >
           <LogOut size={16} className="group-hover:-translate-x-1 transition-transform" />
           <span className="uppercase tracking-widest">Terminate Session</span>
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
         <div className="md:col-span-1 space-y-6">
           <div className="bg-white border border-zinc-100 rounded-xl p-8 flex flex-col items-center text-center shadow-sm relative overflow-hidden group">
             <div className="absolute top-0 left-0 w-full h-1 bg-zinc-900" />
             <div className="relative mb-6">
-              <img 
-                src={profile.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.name}`}
-                className="w-24 h-24 rounded-2xl border-4 border-white shadow-xl group-hover:scale-105 transition-transform duration-500"
-                alt=""
-              />
+              <div className="relative">
+                <img 
+                  src={currentAvatar}
+                  className="w-24 h-24 rounded-2xl border-4 border-white shadow-xl group-hover:scale-105 transition-transform duration-500"
+                  alt=""
+                />
+                <button
+                  onClick={() => setIsPickerOpen(true)}
+                  className="absolute -top-2 -right-2 p-1.5 bg-zinc-900 text-white rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:scale-110 active:scale-95"
+                >
+                  <Pencil size={12} />
+                </button>
+              </div>
               <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center border border-zinc-100 shadow-md">
                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
               </div>
@@ -147,6 +164,14 @@ export default function ProfilePage() {
                    <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">RLS Validated Node</span>
                  </div>
                </div>
+               
+               <button 
+                 onClick={() => setIsPasswordModalOpen(true)}
+                 className="mt-6 w-full flex items-center justify-center gap-2 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all border border-white/10 text-[9px] font-black uppercase tracking-widest group/btn"
+               >
+                 <KeyRound size={14} className="group-hover/btn:rotate-12 transition-transform" />
+                 Rotate Access Key
+               </button>
              </div>
              <ShieldCheck size={120} className="absolute -bottom-10 -right-10 text-white/5 group-hover:rotate-12 transition-all duration-1000 stroke-1" />
           </div>
@@ -188,7 +213,7 @@ export default function ProfilePage() {
           </div>
 
           <div className="p-8 bg-white border border-zinc-100 rounded-xl shadow-sm text-center">
-            <p className="text-xs text-zinc-400 font-medium">To modify your hierarchy level or operational unit, please contact the <span className="text-zinc-900 font-bold">IT Infrastructure Admin</span>.</p>
+            <p className="text-xs text-zinc-400 font-medium">To modify your hierarchy level or operational department, please contact the <span className="text-zinc-900 font-bold">IT Infrastructure Admin</span>.</p>
           </div>
         </div>
       </div>

@@ -34,10 +34,11 @@ export default async function UsersPage() {
     redirect("/dashboard");
   }
 
-  // Fetch all profiles
+  // Fetch all profiles with department names (excluding IT Admin Rank 0)
   const { data: allUsers } = await supabase
     .from("profiles")
-    .select("*")
+    .select("*, department:departments(name)")
+    .neq("role_level", 0)
     .order("role_level", { ascending: true });
 
   return (
@@ -56,7 +57,7 @@ export default async function UsersPage() {
         <div className="h-8 w-px bg-zinc-100 mx-1" />
         <div className="flex items-center gap-1.5">
           {['All Ranks', 'Executives', 'Operations'].map(filter => (
-            <button key={filter} className="px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider text-zinc-400 hover:text-zinc-900 hover:bg-zinc-50 transition-all leading-none">
+            <button key={filter} className="px-4 py-2 rounded-lg text-[10px] font-semibold uppercase tracking-wider text-zinc-400 hover:text-zinc-900 hover:bg-zinc-50 transition-all leading-none">
               {filter}
             </button>
           ))}
@@ -68,14 +69,14 @@ export default async function UsersPage() {
           <table className="w-full text-left border-collapse min-w-[1000px]">
             <thead>
               <tr className="bg-zinc-50/50 border-b border-zinc-100">
-                <th className="px-8 py-5 text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Strategic Identity</th>
-                <th className="px-8 py-5 text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Organizational Rank</th>
-                <th className="px-8 py-5 text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Operational Unit</th>
-                <th className="px-8 py-5 text-[11px] font-bold text-zinc-400 uppercase tracking-wider text-right">Directives</th>
+                <th className="px-8 py-4 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Strategic Identity</th>
+                <th className="px-8 py-4 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Organizational Rank</th>
+                <th className="px-8 py-4 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Operational Department</th>
+                <th className="px-8 py-4 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider text-right">Directives</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-50">
-              {(allUsers || []).map((user: User) => (
+              {(allUsers || []).map((user: any) => (
                 <tr key={user.id} className="hover:bg-zinc-50/30 transition-all group">
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
@@ -90,21 +91,21 @@ export default async function UsersPage() {
                         </div>
                       </div>
                       <div>
-                        <div className="text-sm font-bold text-zinc-900 leading-tight mb-0.5 font-display">{user.name}</div>
-                        <div className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider leading-none">{user.email}</div>
+                        <div className="text-sm font-semibold text-zinc-900 leading-tight mb-0.5">{user.name}</div>
+                        <div className="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider leading-none">{user.email}</div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-8 py-6">
+                  <td className="px-8 py-5">
                     <div className="flex items-center gap-3">
-                      <Badge variant={user.role_level === 0 ? 'reviewed' : 'default'}>{user.role}</Badge>
-                      <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-wider leading-none">Level {user.role_level}</span>
+                      <Badge variant={'default'}>{user.role}</Badge>
+                      <span className="text-[10px] font-semibold text-zinc-300 uppercase tracking-wider leading-none">Level {user.role_level}</span>
                     </div>
                   </td>
-                  <td className="px-8 py-6">
-                    <div className="flex items-center gap-2.5 text-[11px] text-zinc-500 font-bold uppercase tracking-widest">
+                  <td className="px-8 py-5">
+                    <div className="flex items-center gap-2.5 text-[11px] text-zinc-500 font-semibold uppercase tracking-widest">
                       <Building2 size={14} className="text-zinc-300 stroke-2" />
-                      {user.department_id || 'Global Operational Node'}
+                      {user.department?.name || 'Global Operational Node'}
                     </div>
                   </td>
                   <td className="px-8 py-6 text-right">

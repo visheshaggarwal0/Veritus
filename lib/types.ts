@@ -13,7 +13,7 @@ export function cn(...inputs: ClassValue[]) {
  * Higher level number = Higher authority
  */
 export enum Role {
-  IT_ADMIN = 'IT Admin',
+  IT_ADMIN = 'IT Administrator',
   CEO = 'CEO',
   COO = 'COO',
   CSO = 'CSO',
@@ -46,6 +46,7 @@ export interface User {
   role: Role;
   role_level: number;
   department_id?: string;
+  department_name?: string;
   avatar_url?: string;
   password?: string;
 }

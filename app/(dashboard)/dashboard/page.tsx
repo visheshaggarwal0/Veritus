@@ -93,7 +93,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-2">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-zinc-900 mb-1">Workspace Overview</h1>
           <p className="text-zinc-400 font-medium text-sm">Strategic analytics for <span className="font-bold text-zinc-900">{currentUser.name}</span></p>

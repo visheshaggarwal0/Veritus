@@ -2,6 +2,7 @@
 
 import { createAdminClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { createLogAction } from "../logs/actions";
 
 export async function provisionUserAction(formData: {
   email: string;
@@ -9,6 +10,7 @@ export async function provisionUserAction(formData: {
   role: string;
   role_level: number;
   department_name: string;
+  password?: string;
 }) {
   const supabase = await createAdminClient();
 
@@ -26,14 +28,16 @@ export async function provisionUserAction(formData: {
       .select('id')
       .single();
     
-    if (deptError) throw new Error(`Operational Unit creation failed: ${deptError.message}`);
+    if (deptError) throw new Error(`Operational Department creation failed: ${deptError.message}`);
     dept = newDept;
   }
 
   // 2. Create Auth User
-  const { data: { user }, error: authError } = await supabase.auth.admin.createUser({
+  let finalUserId: string;
+
+  const { data: authData, error: authError } = await supabase.auth.admin.createUser({
     email: formData.email,
-    password: Math.random().toString(36).slice(-12) + "!", // Temporary secure password
+    password: formData.password || Math.random().toString(36).slice(-12) + "!", // Fallback to random if not provided
     email_confirm: true,
     user_metadata: {
       full_name: formData.name,
@@ -43,17 +47,29 @@ export async function provisionUserAction(formData: {
     }
   });
 
-  if (authError) throw new Error(`Identity creation failed: ${authError.message}`);
-  if (!user) throw new Error("Null identity node returned.");
+  if (authError) {
+    if (authError.message.toLowerCase().includes("registered") || authError.message.toLowerCase().includes("exists")) {
+      // Identity exists in Tactical Core, synchronize profile instead
+      const { data: listData } = await supabase.auth.admin.listUsers();
+      const existingUser = listData.users.find(u => u.email === formData.email);
+      if (!existingUser) throw new Error(`Strategic Identity Mismatch: ${formData.email} registered in auth but untrackable.`);
+      finalUserId = existingUser.id;
+    } else {
+      throw new Error(`Identity creation protocol failed: ${authError.message}`);
+    }
+  } else {
+    if (!authData.user) throw new Error("Null identity node returned during initialization.");
+    finalUserId = authData.user.id;
+  }
 
-  // 3. Find existing profile by email (if any) and upsert/update
+  // 3. Find existing profile by email OR ID
   const { data: existingProfile } = await supabase
     .from('profiles')
     .select('id')
-    .eq('email', formData.email)
-    .single();
+    .or(`email.eq."${formData.email}",id.eq."${finalUserId}"`)
+    .maybeSingle();
 
-  const finalProfileId = existingProfile?.id || user.id;
+  const finalProfileId = existingProfile?.id || finalUserId;
 
   // 4. Trigger profile creation/update
   // (Trigger usually handles this, but we'll be explicit for reliability)
@@ -69,11 +85,11 @@ export async function provisionUserAction(formData: {
     });
 
   if (profileError) {
-    console.warn("Manual profile sync warning:", profileError.message);
+    throw new Error(`Profile synchronization failed: ${profileError.message}`);
   }
 
   revalidatePath('/users');
-  return { success: true, userId: user.id };
+  return { success: true, userId: finalUserId };
 }
 
 export async function repairIdentityAction(userId: string, metadata: any) {
